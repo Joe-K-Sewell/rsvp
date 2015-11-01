@@ -50,6 +50,7 @@ In this document, the following symbols are used when describing a prototypical 
 
 * `(` and `)` surround a term that is used as a placeholder.
 * `[` and `]` surround a term that is optional.
+* `[...]` indicates "and so on".
 * All other terms that are not surrounded by `(` and `)` indicate a case-insensitive literal character sequence.
 
 For instance, `RSVP[/(major).(minor)]` defines a structure that:
