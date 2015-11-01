@@ -69,9 +69,9 @@ This protocol does not specify how citizens communicate with the server, only th
 
 Commands are issued in the form:
 
-	(sentinel) (verb) [path value]
-	[option_name: option value]
-	[option_name: option value]
+	(sentinel) (verb) [(path value)]
+	[(option_name): (option value)]
+	[(option_name): (option value)]
 	[...]
 
 * **Sentinel** - A key phrase introducing the command.
@@ -162,7 +162,7 @@ Decrees are issued by servers in the form:
 
 	(sentinel) Decree (decree_number) (decree_name)
 	
-	[body]
+	[(body)]
 
 * **Sentinel** - A keyword or phrase introducing the decree (same as in commands; see above).
 * **Decree number** - A canonical number corresponding to the kind of decree issued. Expressed in a series of natural numbers, delimited by `.` - e.g., `3.0`.
