@@ -104,13 +104,16 @@ Some verbs take an argument, called a "path". Depending on the implementation, t
 
 * Be case-sensitive
 * Be expressed in a hierarchical structure with elements separated by `/`
-* Contain whitespace
+* Contain inner whitespace
 
-However, the path MUST NOT contain the line-break character.
+However, the path MUST NOT contain the line-break character, nor treat leading or trailing whitespace as significant.
 
 ### Options
 
-Some verbs take additional arguments, expressed as key-value pairs, called "options". Implementations MAY also define how options are used. For instance, though the `SUGGEST` verb has no protocol-defined options, a Plugin might care about why a citizen chose that location for future use, and so a `Why` option can be provided.
+Some verbs take additional arguments, expressed as key-value pairs, called "options". Implementations MAY also define how options are used. For instance, though the `SUGGEST` verb has no protocol-defined options, a Plugin might care about why a citizen chose that location for future use, and so a `Why` option can be provided:
+
+	RSVP/0.1 SUGGEST Big Dipper
+	Why: Group special, one day only
 
 ### Verbs
 
@@ -121,33 +124,53 @@ In addition to the verbs specified here, implementations may define other verbs 
 Issued by a citizen to indicate a location should be considered in the current election.
 
 * **Path**: Required. The name of the location.
-* **Options**: None protocol-defined. Implementation options may include information about why the location is being proposed, or stipulations about its inclusion.
+* **Options**: None protocol-defined.
 
-The exact result of a citizen suggesting a location is dependent on the ES, but typically it will add the suggested location to a list of candidates that can then be voted on. Because suggestions may be issued in private channels, the ES should decree when a new suggestion is added, or decree the full list at a regular interval.
+The exact result of a citizen suggesting a location is dependent on the ES, but typically it will add the suggested location to a list of candidates that can then be voted on.
 
-*Examples*
-
-Suggesting a location without options:
-
-	RSVP/0.1 SUGGEST Joe's
-
-Suggesting a location with implementation options:
-
-	RSVP/0.1 SUGGEST Big Dipper
-	Why: Group special, one day only
-	When: Before noon, they're usually crowded
+Because suggestions, like all commands, may be issued in private channels, the ES SHOULD either decree when a new suggestion is added and/or decree the full list at a regular interval.
 
 #### VOTE
 
+Issued by a citizen to voice their opinion on a location in the current election.
+
+* **Path**: Required. The name of the location.
+* **Options**: None protocol-defined.
+
+The exact result of voting on a location is dependent on the ES, but typically it will increment a counter for the suggested location. The ES can choose to restrict the amount of votes a citizen can make. If the ES provides multiple kinds of votes, the kind can be selected using an implementation option.
+
 #### RESCIND
 
-#### REGISTER (citizen)
+Issued by a citizen to retract a prior VOTE.
 
-#### REGISTER (location)
+* **Path**: Implementation-dependent.
+* **Options**: None protocol-defined.
+
+The ES SHOULD reverse all effects made by the prior VOTE. If there can be multiple VOTEs, the ES MAY either reverse all VOTEs with a single RESCIND, or require the vote be specified by the path and/or options.
+
+#### REGISTER
+
+Issued by a citizen to inform the server of the existence of an entity: either the citizen themself, or a location.
+
+* **Path**:
+	* If registering the citizen, do not include.
+	* If registering a location, the location name.
+* **Options**:
+	* If registering the citizen, none protocol-defined.
+	* If registering a location, metadata to include with the location.
+
+Implementations MAY automatically register citizens and locations as they are used, instead of requiring the use of this verb.
+
+When registering a citizen, the implementation SHOULD require some form of authentication. This might be as simple as using the underlying communication's own user system (and thus requiring nothing further from the citizen), or some manner of passing authentication tokens via options (over private channels, of course).
 
 #### METADATA
 
-#### OPTIONS
+Issued by a citizen to update or list the metadata of a location.
+
+* **Path**: Required. The name of the location.
+* **Options**: The metadata key-value pairs to set.
+	* If the option value is empty, the associated metadata will be removed.
+	* If no options are specified, all metadata for the location is listed in the reply.
 
 ## Replies
 
@@ -249,7 +272,3 @@ The ES has stopped accepting votes.
 ### 3 Abnormal
 
 ### 4 Failure
-
-## Plugin Interface
-
-## Future Development
