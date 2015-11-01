@@ -15,7 +15,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 ### Entities
 
 * **Server** - An automated service that organizes elections and communicates with citizens (over RSVP) to produce election results.
-	* An **implementation** - Unless otherwise qualified, refers to an implementation of a Server. 
+	* An **implementation** - Unless otherwise qualified, refers to an implementation of a Server, including how its behavior is affected by installed Plugins.
 * **Citizen** - A human entity that participates in elections. Analogous to a "client" in other protocol terminology.
 * **Electorate** - A group of citizens that participate in elections. Each electorate has their own server.
 * **Location** - A representation of a real-world eatery, typically stored by the server on a database. Consists of:
@@ -78,7 +78,7 @@ Commands are issued in the form:
 * **Sentinel** - A key phrase introducing the command.
 * **Verb** - The specific kind of command to issue.
 * **Path** - An argument for the command, such as a location name.
-* **Options** - Additional arguments for some commands.
+* **Option name** and **option value** - Key-value pairs that can be used with some commands.
 
 ### Sentinel
 
@@ -98,7 +98,19 @@ Version information is OPTIONAL, but if it is specified, the server is required 
 
 If the version given is not supported by the server, the server MUST reply `505 RSVP Version Not Supported` and MUST NOT carry out the command.
 
+### Path
+
+Some verbs take an argument, called a "path". Depending on the implementation, this value MAY:
+
+* Be case-sensitive
+* Be expressed in a hierarchical structure with elements separated by `/`
+* Contain whitespace
+
+However, the path MUST NOT contain the line-break character.
+
 ### Options
+
+Some verbs take additional arguments, expressed as key-value pairs, called "options". Implementations MAY also define how options are used. For instance, though the `SUGGEST` verb has no protocol-defined options, a Plugin might care about why a citizen chose that location for future use, and so a `Why` option can be provided.
 
 ### Verbs
 
@@ -109,7 +121,7 @@ In addition to the verbs specified here, implementations may define other verbs 
 Issued by a citizen to indicate a location should be considered in the current election.
 
 * **Path**: Required. The name of the location.
-* **Options**: None protocol-defined. May include information about why the location is being proposed, or stipulations about its inclusion.
+* **Options**: None protocol-defined. Implementation options may include information about why the location is being proposed, or stipulations about its inclusion.
 
 The exact result of a citizen suggesting a location is dependent on the ES, but typically it will add the suggested location to a list of candidates that can then be voted on. Because suggestions may be issued in private channels, the ES should decree when a new suggestion is added, or decree the full list at a regular interval.
 
@@ -119,7 +131,7 @@ Suggesting a location without options:
 
 	RSVP/0.1 SUGGEST Joe's
 
-Suggesting a location with options:
+Suggesting a location with implementation options:
 
 	RSVP/0.1 SUGGEST Big Dipper
 	Why: Group special, one day only
