@@ -168,7 +168,7 @@ Decrees are issued by servers in the form:
 * **Sentinel** - A keyword or phrase introducing the decree (same as in commands; see above).
 * **Decree number** - A canonical number corresponding to the kind of decree issued. Expressed in a series of natural numbers, delimited by `.` - e.g., `3.0`.
 * **Decree name** - A human-readable description of the decree.
-* **Body** - Human-readable information contained in the decree.
+* **Body** - Human-readable information contained in the decree. May have further line-breaks.
 
 ### 0 Plugin-reserved
 
