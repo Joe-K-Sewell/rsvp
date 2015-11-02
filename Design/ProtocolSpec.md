@@ -165,12 +165,28 @@ When registering a citizen, the implementation SHOULD require some form of authe
 
 #### METADATA
 
-Issued by a citizen to update or list the metadata of a location.
+Issued by a citizen to update the metadata of a location.
 
 * **Path**: Required. The name of the location.
 * **Options**: The metadata key-value pairs to set.
 	* If the option value is empty, the associated metadata will be removed.
-	* If no options are specified, all metadata for the location is listed in the reply.
+
+#### LIST
+
+Issued by a citizen to list locations, the metadata of a location, or citizens.
+
+* **Path**: Optional. The name of a location or the literal `citizens`.
+	* If omitted, the reply contains a list of location names.
+		* If the *All* option is `true`, this list contains all registered locations.
+		* Otherwise, this list contains the candidates in the current election.
+	* If a location name, the reply contains the metadata for the given location.
+	* If `citizens`, the reply contains a list of citizen names.
+		* If the *All* option is `false`, this list contains the citizens who have suggested or voted in the current election.
+		* Otherwise, this list contains all registered citizens.
+* **Options**:
+	* *All*: Optional. If specified, `true` or `false`. See above for behavior.
+
+The items in all lists returned are separated by line breaks.
 
 ## Replies
 
