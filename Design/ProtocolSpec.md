@@ -62,9 +62,21 @@ For instance, `RSVP[/(major).(minor)]` defines a structure that:
 	* Followed by a literal `.`
 	* Followed by a placeholder called `minor` which is defined after the definition
 
-## Protocol vs. Implementation
+## Implementation Considerations
 
 This protocol does not specify how citizens communicate with the server, only the content of that communication. While conforming implementations SHOULD allow the textual representations specified here, they may also include other means of communication, such as a graphical interface.
+
+### Citizen identification
+
+The implementation MUST have a way to distinguish and verify citizens, including associating every command issued with a particular citizen. If the underlying protocol already has a user system, it may already be sufficient for this purpose. If no such method exists, options may be used on commands to authenticate citizen commands.
+
+### Public vs. Private Channels
+
+If the underlying protocol allows direct communication between a citizen and the server, this method is called a **private channel**. Other methods, which allow other citizens to observe the communication, are **public channels**.
+
+The presence of private channels is not a prerequisite for using a given underlying protocol, though it presents challenges to anonymous voting. If private channels are present, the implementation SHOULD allow commands to be issued over them. If a command is received over such a channel, the reply MUST be on that same channel.
+
+Decrees SHOULD be made on public channels.
 
 ## Commands
 
@@ -160,8 +172,6 @@ Issued by a citizen to inform the server of the existence of an entity: either t
 	* If registering a location, metadata to include with the location.
 
 Implementations MAY automatically register citizens and locations as they are used, instead of requiring the use of this verb.
-
-When registering a citizen, the implementation SHOULD require some form of authentication. This might be as simple as using the underlying communication's own user system (and thus requiring nothing further from the citizen), or some manner of passing authentication tokens via options (over private channels, of course).
 
 #### METADATA
 
