@@ -222,6 +222,7 @@ Issued by a citizen to list locations, the metadata of a location, or citizens.
 		* If the *All* option is `true`, this list contains all registered locations.
 		* Otherwise, this list contains the candidates in the current election.
 	* If a location name, the reply contains the metadata for the given location.
+		* The *All* option has no effect on this mode.
 	* If `citizens`, the reply contains a list of citizen names.
 		* If the *All* option is `false`, this list contains the citizens who have suggested or voted in the current election.
 		* Otherwise, this list contains all registered citizens.
