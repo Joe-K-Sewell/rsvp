@@ -110,6 +110,8 @@ Decrees SHOULD be made on public channels, if available. Otherwise, they SHOULD 
 
 ## Commands
 
+A command is an instruction given by a citizen to the server. The server will react appropriately, and transmit a Reply to the citizen to inform that citizen of the result.
+
 Commands are issued in the form:
 
 	(sentinel) (verb) [(path value)]
