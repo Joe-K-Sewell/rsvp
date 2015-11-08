@@ -104,9 +104,9 @@ The implementation MUST have a way to distinguish and verify citizens, including
 
 If the underlying protocol allows direct communication between a citizen and the server, this method is called a **private channel**. Other methods, which allow other citizens to observe the communication, are **public channels**.
 
-The presence of private channels is not a prerequisite for using a given underlying protocol, though it presents challenges to anonymous voting. If private channels are present, the implementation SHOULD allow commands to be issued over them. If a command is received over such a channel, the reply MUST be on that same channel.
+The presence of private channels is not a prerequisite for using a given underlying protocol, though it presents challenges to anonymous voting. If private channels are present, the implementation SHOULD allow commands to be issued over them. If a command is received over such a channel, the reply MUST also be on a private channel.
 
-Decrees SHOULD be made on public channels.
+Decrees SHOULD be made on public channels, if available. Otherwise, they SHOULD be transmitted simultaneously to all participating citizens.
 
 ## Commands
 
@@ -124,7 +124,7 @@ Commands are issued in the form:
 
 ### Sentinel
 
-A sentinel is used to indicate the text being issued is relevant to RSVP. This is necessary in shared interactive environments, such as chat rooms, where not all text posted to the room needs to be taken as input by the server. All implementations SHOULD support sentinels, but depending on the use case they might not require them.
+A sentinel is used to indicate the text being issued is relevant to RSVP. This is necessary in public channels, such as chat rooms, where not all text posted to the room needs to be taken as input by the server (i.e., some text posted to that medium may not have any bearing on RSVP at all). All implementations SHOULD support sentinels, but depending on the use case they might not require them.
 
 Sentinels take the form:
 
