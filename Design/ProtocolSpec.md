@@ -82,36 +82,7 @@ A server:
 * MAY only explicitly implement one minor version of a given major specification version, and through that implementation support all prior minor versions of that major version.
 * MUST decree using only the latest supported specification version.
 
-### Handling Commands
-
-Consider a server. It has implementations of this protocol, expressed as a set of major versions each mapped to a set of minor versions. When a server receives a command:
-
-* If the command did not specify a version:
-	1. The highest major version is selected. 
-	2. From the set of associated minor versions, the highest minor version is selected.
-	3. The implementation associated with the selected version services the command, replying with the selected version.
-* If the command did specify a version, `X.Y`:
-	1. If `X` is not a supported major version:
-		1. The highest major version is selected.
-		2. From the set of associated minor versions, the highest minor version is selected.
-		3. The command is rejected with a reply of `505 RSVP Version Not Supported`, using the selected version number.
-	2. Otherwise, major version `X` is selected.
-	3. If `Y` is greater than all of the associated minor versions:
-		1. The highest such minor version is selected.
-		2. The command is rejected with a reply of `505 RSVP Version Not Supported`, using the selected version number.
-	3. Otherwise, from the set of associated minor versions, the highest minor version that does not exceed `Y` is selected.
-	4. The implementation associated with the selected version services the command, replying with the selected version.
-
-For instance, an "RSVPico" server may be versioned `3.7.1`, and implements versions `1.0`, `1.2`, and `2.0`. Its set would look something like this:
-
-	{1 -> {0, 2}, 2 -> {0}}
-
-* Citizens can send commands with version `1.0`. These commands will be fulfilled by the server's implementation of `1.0`. Replies will indicate version `1.0`. 
-* Citizens can also send commands with either version `1.1` or `1.2`. These commands will be fulfilled by the server's implementation of `1.2`. Replies will indicate version `1.2`.
-* Citizens can also send commands with version `2.0`.  These commands will be fulfilled by the server's implementation of `2.0`. Replies will use version `2.0`.
-* Citizens can not successfully send commands with version `1.5`. These commands will not be processed. Replies will be `505 RSVP Version Not Supported` and use version `1.2`.
-* Citizens can not successfully send commands with version `3.0`. These commands will not be processed. Replies will be `505 RSVP Version Not Supported` and use version `2.0`.
-* The server will always decree in version `2.0`.
+Servers are REQUIRED to select versions to service commands by the algorithm listed in the [Version Selection process](#processes-version-selection).
 
 ## Implementation Considerations
 
@@ -352,3 +323,41 @@ The ES has stopped accepting votes.
 ### 3 Abnormal
 
 ### 4 Failure
+
+# Processes
+
+## Command Handling
+
+### Version Selection
+<a name="processes-version-selection"></a>
+A server has implementations of this protocol, expressed as a set of major versions each mapped to a set of minor versions. When a server receives a command:
+
+* If the command did not specify a version:
+	1. The highest major version is selected. 
+	2. From the set of associated minor versions, the highest minor version is selected.
+	3. The implementation associated with the selected version services the command, replying with the selected version.
+* If the command did specify a version, `X.Y`:
+	1. If `X` is not a supported major version:
+		1. The highest major version is selected.
+		2. From the set of associated minor versions, the highest minor version is selected.
+		3. The command is rejected with a reply of `505 RSVP Version Not Supported`, using the selected version number.
+	2. Otherwise, major version `X` is selected.
+	3. If `Y` is greater than all of the associated minor versions:
+		1. The highest such minor version is selected.
+		2. The command is rejected with a reply of `505 RSVP Version Not Supported`, using the selected version number.
+	3. Otherwise, find the compatible minor versions for this command. A minor version `C` is compatible iff `Y <= C`.
+	4. From the compatible minor versions, select the smallest.
+	5. The implementation associated with the selected version services the command, replying with the selected version.
+
+For instance, an "RSVPico" server may be versioned `3.7.1`, and implements versions `1.0`, `1.2`, and `2.0`. Expressed as a mapping:
+
+	{1 -> {0, 2}, 2 -> {0}}
+
+With this configuration:
+
+* Citizens can send commands with version `1.0`. These commands will be fulfilled by the server's implementation of `1.0`. Replies will indicate version `1.0`. 
+* Citizens can also send commands with either version `1.1` or `1.2`. These commands will be fulfilled by the server's implementation of `1.2`. Replies will indicate version `1.2`.
+* Citizens can also send commands with version `2.0`.  These commands will be fulfilled by the server's implementation of `2.0`. Replies will use version `2.0`.
+* Citizens can not successfully send commands with version `1.5`. These commands will not be processed. Replies will be `505 RSVP Version Not Supported` and use version `1.2`.
+* Citizens can not successfully send commands with version `3.0`. These commands will not be processed. Replies will be `505 RSVP Version Not Supported` and use version `2.0`.
+* The server will always decree in version `2.0`.
