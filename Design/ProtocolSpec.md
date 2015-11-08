@@ -2,8 +2,6 @@
 
 **VERSION 0.1**
 
-This specification is a public API that adheres to [Semantic Versioning](http://semver.org/).
-
 ## Introduction
 
 The Restaurant Suggestion and Voting Protocol (RSVP) allows members of an organization (an *electorate*) to nominate and vote on dining locations for a lunch trip. Deliberately over-engineered and has a user-facing syntax of HTTP. Solve the pesky human problem of your coworkers being indecisive or apathetic about sustenance by injecting *technology*!
@@ -62,6 +60,38 @@ For instance, `RSVP[/(major).(minor)]` defines a structure that:
 	* Followed by a literal `.`
 	* Followed by a placeholder called `minor` which is defined after the definition
 
+## Versioning
+
+### Specification
+
+This specification is a public API that adheres to [Semantic Versioning](http://semver.org/). This means:
+
+* The version of this specification consists of a major and minor version.
+* The major version delimits breaking changes.
+* The minor version delimits changes which are compatible with prior minor versions of the same major version.
+
+For instance, consider a command sent to versions `1.0`, `1.1`, and `2.0`. Version `1.1` will do everything `1.0` did, although additional effects may also happen (provided these do not violate `1.0`). Version `2.0` can behave totally differently than both `1.0` and `1.1`.
+
+### Implementation
+
+A server:
+
+* SHOULD version itself separately from this specification, to enable feature development and enhancements unrelated to RSVP proper (such as plugin capabilities).
+* MAY support multiple specification versions.
+* SHOULD document all specification versions it supports.
+* MAY only explicitly implement one minor version of a given major specification version, and through that implementation support all prior minor versions of that major version.
+* MUST indicate the version used to service a command in the command's reply.
+* MUST reply with `505 RSVP Version Not Supported`, using the latest supported specification version, if it does not support the version specified by the command.
+* MUST decree using the latest supported specification version (both major and minor).
+
+For instance, an "RSVPico" server may be versioned `3.7.1`, and implements versions `1.0`, `1.2`, and `2.0`:
+
+* Citizens can send commands with version `1.0`. These commands will be fulfilled by the server's implementation of `1.0`. Replies will indicate version `1.0`. 
+* Citizens can also send commands with either version `1.1` or `1.2`. These commands will be fulfilled by the server's implementation of `1.2`. Replies will indicate version `1.2`.
+* Citizens can also send commands with version `2.0`.  These commands will be fulfilled by the server's implementation of `2.0`. Replies will use version `2.0`.
+* Citizens can not send commands with either version `2.1` or `3.0`. These commands will not be processed. Replies will be `505 RSVP Version Not Supported` and use version `2.0`.
+* The server will always decree in version `2.0`.
+
 ## Implementation Considerations
 
 This protocol does not specify how citizens communicate with the server, only the content of that communication. While conforming implementations SHOULD allow the textual representations specified here, they may also include other means of communication, such as a graphical interface.
@@ -102,7 +132,7 @@ Sentinels take the form:
 
 where `major` and `minor` correspond to the major and minor version number of the protocol version the command expects.
 
-Version information is OPTIONAL, but if it is specified, the server is required to validate that it supports that version. For instance, the following are all valid sentinels for a server supporting both `1.0` and `1.1`:
+Version information is OPTIONAL for sentinels specified in commands, but if it is specified, the server is REQUIRED to validate that it supports that version. For instance, the following are all valid sentinels for a server supporting both `1.0` and `1.1`:
 
 `RSVP`  
 `RSVP/1.0`  
