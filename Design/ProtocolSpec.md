@@ -126,13 +126,17 @@ Sentinels take the form:
 
 where `major` and `minor` correspond to the major and minor version number of the protocol version the command expects.
 
-Version information is OPTIONAL for sentinels specified in commands, but if it is specified, the server is REQUIRED to validate that it supports that version. For instance, the following are all valid sentinels for a server supporting both `1.0` and `1.1`:
+Version information is OPTIONAL for sentinels specified in commands, but if it is specified, the server is REQUIRED to validate that it supports that version. 
+
+For instance, the following are all valid sentinels for a server supporting both `1.0` and `1.1`:
 
 `RSVP`  
 `RSVP/1.0`  
 `RSVP/1.1`  
 
-If the version given is not supported by the server, the server MUST reply `505 RSVP Version Not Supported` and MUST NOT carry out the command.
+If the version given is not supported by the server, the server MUST reply `505 RSVP Version Not Supported` and MUST NOT carry out the command. 
+
+For more information, see the [Version Selection process](#processes-version-selection).
 
 ### Path
 
@@ -241,7 +245,9 @@ The items in all lists returned are separated by line breaks.
 
 The server does not support the version specified by the command's sentinel.
 
-For instance, if a server only supports version `1.0` and a citizen issues `RSVP/1.1 VOTE Joe's`, the server MUST reply with `505`. This is the case even if the command could be issued with a `1.0` sentinel and be processed successfully; because the server does not support version `1.1`, it has no way of knowing whether the `1.0` processing of the command is correct when the citizen expects the `1.1` behavior (which, per Semantic Versioning, may have added behavior to the verb).
+For instance, if a server only supports version `1.0` and a citizen issues `RSVP/1.1 VOTE Joe's`, the server MUST reply with `505`. This is the case even if the command could be issued with a `1.0` sentinel and be processed successfully; because the server does not support version `1.1`, it has no way of knowing whether the `1.0` processing of the command is correct when the citizen expects the `1.1` behavior.
+
+For more information, see the [Version Selection process](#processes-version-selection).
 
 ## Decrees
 
