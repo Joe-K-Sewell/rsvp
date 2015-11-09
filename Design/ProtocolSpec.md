@@ -116,6 +116,8 @@ Commands are issued in the form:
 * **Path** - An argument for the command, such as a location name.
 * **Option name** and **option value** - Key-value pairs that can be used with some commands.
 
+Note that the order of the elements in the first line is different than that of an HTTP request: the sentinel comes first.
+
 ### Sentinel
 
 A sentinel is used to indicate the text being issued is relevant to RSVP. This is necessary in public channels, such as chat rooms, where not all text posted to the room needs to be taken as input by the server (i.e., some text posted to that medium may not have any bearing on RSVP at all). All implementations SHOULD support sentinels, but depending on the use case they might not require them.
@@ -229,17 +231,49 @@ The items in all lists returned are separated by line breaks.
 
 ## Replies
 
-### 0xx Plugin-reserved
+After receiving and processing a command, the server issues a corresponding **reply**. If the command was received by a private channel, the reply MUST also be transmitted by private channel.
 
-### 1xx Pending Server Action
+Commands are issued in the form:
 
-### 2xx Success
+	(reply code) (reply name) (sentinel)
+	
+	[(body)]
 
-### 3xx Pending Citizen Action
+* Reply code - A numerical representation (three digit decimal integer) of the type of reply.
+* Reply name - A human-readable representation of the type of reply.
+* Sentinel - A key phrase indicating the version of the server logic that handled the command.
+* Body - Additional human- (and occasionally machine-) readable text describing the result.
 
-### 4xx Citizen Error
+Note that the order of the elements in the first line is different than that of an HTTP response: the sentinel comes last.
 
-### 5xx Server Error
+### Sentinel
+
+Unlike the sentinel of the command, a reply's sentinel is REQUIRED. This is so that the citizen can know under what protocol version semantics their command was handled.
+
+Sentinels take the form:
+
+	RSVP/(major).(minor)
+
+where `major` and `minor` correspond to the major and minor version number of the protocol version that was used to service the command.
+
+For more information, see the [Version Selection process](#processes-version-selection).
+
+### Reply Codes 0xx (Implementation-reserved)
+
+Reply codes that begin with `0` will not be used by this specification. They MAY be used by implementations for replies when no specified reply code is sufficient, especially for implementation-specific behavior.
+
+Because reply codes MUST have exactly three decimal digits, these reply codes require a leading `0`. A reply code like `15` is not valid, but `015` is.
+
+### Reply Codes 1xx (Pending Server Action)
+
+
+### Reply Codes 2xx (Success)
+
+### Reply Codes 3xx (Pending Citizen Action)
+
+### Reply Codes 4xx (Citizen Error)
+
+### Reply Codes 5xx (Server Error)
 
 #### 505 RSVP Version Not Supported
 
