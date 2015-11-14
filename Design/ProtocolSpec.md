@@ -6,18 +6,20 @@
 
 The Restaurant Suggestion and Voting Protocol (RSVP) allows members of an organization (an *electorate*) to nominate and vote on dining locations for a lunch trip. Deliberately over-engineered and has a user-facing syntax of HTTP. Solve the pesky human problem of your coworkers being indecisive or apathetic about sustenance by injecting *technology*!
 
+Though a parody of a client-server model, this specification does not describe the interaction of two automated components. Rather, it defines the interaction of a usually-human component (a *citizen*) with an automated system (a *service*).
+
 ## Definitions
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](http://tools.ietf.org/html/rfc2119).
 
 ### Entities
 
-* **Server** - An automated service that organizes elections and communicates with citizens (over RSVP) to produce election results.
-	* An **implementation** - Unless otherwise qualified, refers to an implementation of a Server, including how its behavior is affected by installed Plugins.
-* **Citizen** - A human entity that participates in elections. Analogous to a "client" in other protocol terminology.
-* **Electorate** - A group of citizens that participate in elections. Each electorate has their own server.
-* **Location** - A representation of a real-world eatery, typically stored by the server on a database. Consists of:
-	* **Name** - An identifier used in the protocol (though the server may allow aliases).
+* **Service** - An automation that organizes elections and communicates with citizens (over RSVP) to produce election results.
+	* An **implementation** - Unless otherwise qualified, refers to an implementation of a service, including how its behavior is affected by installed Plugins.
+* **Citizen** - A human entity that participates in elections.
+* **Electorate** - A group of citizens that participate in elections. Each electorate has their own service.
+* **Location** - A representation of a real-world eatery, typically stored by the service on a database. Consists of:
+	* **Name** - An identifier used in the protocol (though the service may allow aliases).
 	* **Metadata** - Plugin- or implementation-specific key-value pairs to describe the location further.
 
 ### Elections
@@ -30,16 +32,16 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ### Communication
 
-* **Command** - An instruction given by a citizen to the server. These include suggesting candidates and voting.
-* **Reply** - A response to given by the server to a citizen's command.
-* **Decree** - Information given by the server to the electorate.
-* **Registration** - An action a citizen can take to tell the server it should store information on the citizen itself, or a location. Implementations may have registration be optional, and automatically detect new citizens and/or locations.
+* **Command** - An instruction given by a citizen to the service. These include suggesting candidates and voting.
+* **Reply** - A response to given by the service to a citizen's command.
+* **Decree** - Information given by the service to the electorate.
+* **Registration** - An action a citizen can take to tell the service it should store information on the citizen itself, or a location. Implementations may have registration be optional, and automatically detect new citizens and/or locations.
 
 ### Customization
 
-* **Plugin** - A piece of coded functionality that a server can use to alter its behavior. The format and installation of these plugins are implementation-defined, but some kinds of customization are explicitly defined by this specification and SHOULD be implemented.
-* **Superdelegate** - A plugin that suggests locations. Zero or more may be installed on a server.
-* **Vetoer** - A plugin that can reject suggestions, from both superdelegates and citizens. Zero or more may be installed on a server.
+* **Plugin** - A piece of coded functionality that a service can use to alter its behavior. The format and installation of these plugins are implementation-defined, but some kinds of customization are explicitly defined by this specification and SHOULD be implemented.
+* **Superdelegate** - A plugin that suggests locations. Zero or more may be installed on a service.
+* **Vetoer** - A plugin that can reject suggestions, from both superdelegates and citizens. Zero or more may be installed on a service.
 * **Election System (ES)** - A plugin that defines how an election is carried out, such as how votes are counted, and how the results are presented. Each election MUST have an ES, though an implementation may provide a default ES in absence of a suitable Plugin.
 
 ### Syntax
@@ -74,7 +76,7 @@ For instance, consider a command sent to versions `1.0`, `1.1`, and `2.0`. Versi
 
 ### Implementation
 
-A server:
+A service:
 
 * SHOULD version itself separately from this specification, to enable feature development and enhancements unrelated to RSVP proper (such as plugin capabilities).
 * MAY support multiple specification versions.
@@ -82,11 +84,11 @@ A server:
 * MAY only explicitly implement one minor version of a given major specification version, and through that implementation support all prior minor versions of that major version.
 * MUST decree using only the latest supported specification version.
 
-Servers are REQUIRED to select versions to service commands by the algorithm listed in the [Version Selection process](#processes-version-selection).
+Services are REQUIRED to select versions to service commands by the algorithm listed in the [Version Selection process](#processes-version-selection).
 
 ## Implementation Considerations
 
-This protocol does not specify how citizens communicate with the server, only the content of that communication. While conforming implementations SHOULD allow the textual representations specified here, they may also include other means of communication, such as a graphical interface.
+This protocol does not specify how citizens communicate with the service, only the content of that communication. While conforming implementations SHOULD allow the textual representations specified here, they may also include other means of communication, such as a graphical interface.
 
 ### Citizen identification
 
@@ -94,7 +96,7 @@ The implementation MUST have a way to distinguish and verify citizens, including
 
 ### Public vs. Private Channels
 
-If the underlying protocol allows direct communication between a citizen and the server, this method is called a **private channel**. Other methods, which allow other citizens to observe the communication, are **public channels**.
+If the underlying protocol allows direct communication between a citizen and the service, this method is called a **private channel**. Other methods, which allow other citizens to observe the communication, are **public channels**.
 
 The presence of private channels is not a prerequisite for using a given underlying protocol, though it presents challenges to anonymous voting. If private channels are present, the implementation SHOULD allow commands to be issued over them. If a command is received over such a channel, the reply MUST also be on a private channel.
 
@@ -102,7 +104,7 @@ Decrees SHOULD be made on public channels, if available. Otherwise, they SHOULD 
 
 ## Commands
 
-A command is an instruction given by a citizen to the server. The server will react appropriately, and transmit a Reply to the citizen to inform that citizen of the result.
+A command is an instruction given by a citizen to the service. The service will react appropriately, and transmit a Reply to the citizen to inform that citizen of the result.
 
 Commands are issued in the form:
 
@@ -120,7 +122,7 @@ Note that the order of the elements in the first line is different than that of 
 
 ### Sentinel
 
-A sentinel is used to indicate the text being issued is relevant to RSVP. This is necessary in public channels, such as chat rooms, where not all text posted to the room needs to be taken as input by the server (i.e., some text posted to that medium may not have any bearing on RSVP at all). All implementations SHOULD support sentinels, but depending on the use case they might not require them.
+A sentinel is used to indicate the text being issued is relevant to RSVP. This is necessary in public channels, such as chat rooms, where not all text posted to the room needs to be taken as input by the service (i.e., some text posted to that medium may not have any bearing on RSVP at all). All implementations SHOULD support sentinels, but depending on the use case they might not require them.
 
 Sentinels take the form:
 
@@ -128,15 +130,15 @@ Sentinels take the form:
 
 where `major` and `minor` correspond to the major and minor version number of the protocol version the command expects.
 
-Version information is OPTIONAL for sentinels specified in commands, but if it is specified, the server is REQUIRED to validate that it supports that version. 
+Version information is OPTIONAL for sentinels specified in commands, but if it is specified, the service is REQUIRED to validate that it supports that version. 
 
-For instance, the following are all valid sentinels for a server supporting both `1.0` and `1.1`:
+For instance, the following are all valid sentinels for a service supporting both `1.0` and `1.1`:
 
 `RSVP`  
 `RSVP/1.0`  
 `RSVP/1.1`  
 
-If the version given is not supported by the server, the server MUST reply `UNSUPPORTED` and MUST NOT carry out the command. 
+If the version given is not supported by the service, the service MUST reply `UNSUPPORTED` and MUST NOT carry out the command. 
 
 For more information, see the [Version Selection process](#processes-version-selection).
 
@@ -192,7 +194,7 @@ The ES SHOULD reverse all effects made by the prior VOTE. If there can be multip
 
 #### REGISTER
 
-Issued by a citizen to inform the server of the existence of an entity: either the citizen themself, or a location.
+Issued by a citizen to inform the service of the existence of an entity: either the citizen themself, or a location.
 
 * **Path**:
 	* If registering the citizen, do not include.
@@ -231,7 +233,7 @@ The items in all lists returned are separated by line breaks.
 
 ## Replies
 
-After receiving and processing a command, the server issues a corresponding **reply**. If the command was received by a private channel, the reply MUST also be transmitted by private channel.
+After receiving and processing a command, the service issues a corresponding **reply**. If the command was received by a private channel, the reply MUST also be transmitted by private channel.
 
 Commands are issued in the form:
 
@@ -240,7 +242,7 @@ Commands are issued in the form:
 	[(body)]
 
 * **Reply mnemonic** - A textual representation of the type of reply.
-* **Sentinel** - A key phrase indicating the version of the server logic that handled the command.
+* **Sentinel** - A key phrase indicating the version of the service logic that handled the command.
 * **Body** - Additional human- (and occasionally machine-) readable text describing the result.
 
 Note that the order of the elements in the first line is different than that of an HTTP response: the sentinel comes last.
@@ -273,7 +275,7 @@ The command was received and processed successfully. The body MUST contain conte
 
 #### NEW
 
-The command was received and processed successfully. As a result, a new entity was created on the server. The body MAY contain additional information about what was created.
+The command was received and processed successfully. As a result, a new entity was created on the service. The body MAY contain additional information about what was created.
 
 #### REJECTED
 
@@ -293,17 +295,17 @@ The command can't be executed by the commanding citizen. The body MAY contain re
 
 #### UNSUPPORTED
 
-The server does not support the version specified by the command's sentinel. The body MAY explain why the command failed, and recommend using the version specified in the reply itself.
+The service does not support the version specified by the command's sentinel. The body MAY explain why the command failed, and recommend using the version specified in the reply itself.
 
 See the [Version Selection process](#processes-version-selection).
 
 #### ERROR
 
-The server erred. The body SHOULD contain human-readable details of the error, if they can be relayed without exposing secure implementation information.
+The service erred. The body SHOULD contain human-readable details of the error, if they can be relayed without exposing secure implementation information.
 
 ## Decrees
 
-Decrees are issued by servers in the form:
+Decrees are issued by service in the form:
 
 	(sentinel) (decree_number) (decree_name)
 	
@@ -321,9 +323,9 @@ Decrees are issued by servers in the form:
 <a name="processes-version-selection"></a>
 ### Version Selection
 
-Servers may implement multiple versions of this protocol. To ensure that commands are processed by the semantics intended by the issuing citizen, this section describes an algorithm that finds the best fit for a given command's version. If the specified version is not supported, this algorithm also ensures the error reply contains relevant version information for the citizen to consider. Servers MUST implement this algorithm to ensure consistent behavior.
+Services may implement multiple versions of this protocol. To ensure that commands are processed by the semantics intended by the issuing citizen, this section describes an algorithm that finds the best fit for a given command's version. If the specified version is not supported, this algorithm also ensures the error reply contains relevant version information for the citizen to consider. Services MUST implement this algorithm to ensure consistent behavior.
 
-Consider the protocol versions a server supports. They can be thought of being stored in a mapping, `V`, of integers (the major versions) to sets of integers (the minor versions). When a server receives a command:
+Consider the protocol versions a service supports. They can be thought of being stored in a mapping, `V`, of integers (the major versions) to sets of integers (the minor versions). When a service receives a command:
 
 1. If the command did not specify a version:
 	1. Let `a` be the greatest key in `V`.  
@@ -341,15 +343,15 @@ Consider the protocol versions a server supports. They can be thought of being s
 6. Let `m` be the the minimum element of `S`.
 7. Implementation `x.m` services the command, and this version number is used on replies to the command. **Processing stops here.**
 
-*Example:* For example, an "RSVPico" server implements versions `1.0`, `1.2`, and `2.0`. Thus,
+*Example:* For example, an "RSVPico" service implements versions `1.0`, `1.2`, and `2.0`. Thus,
 
 	V = {1 -> {0, 2}, 2 -> {0}}
 
-With the aforementioned example server:
+With the aforementioned example service:
 
-* Citizens can send commands with version `1.0`. These commands will be fulfilled by the server's implementation of `1.0`. Replies will indicate version `1.0`. 
-* Citizens can also send commands with either version `1.1` or `1.2`. These commands will be fulfilled by the server's implementation of `1.2`. Replies will indicate version `1.2`.
-* Citizens can also send commands with version `2.0`.  These commands will be fulfilled by the server's implementation of `2.0`. Replies will use version `2.0`.
-* Citizens can also send commands with no version specified.  These commands will be fulfilled by the server's implementation of `2.0`. Replies will use version `2.0`.
+* Citizens can send commands with version `1.0`. These commands will be fulfilled by the service's implementation of `1.0`. Replies will indicate version `1.0`. 
+* Citizens can also send commands with either version `1.1` or `1.2`. These commands will be fulfilled by the service's implementation of `1.2`. Replies will indicate version `1.2`.
+* Citizens can also send commands with version `2.0`.  These commands will be fulfilled by the service's implementation of `2.0`. Replies will use version `2.0`.
+* Citizens can also send commands with no version specified.  These commands will be fulfilled by the service's implementation of `2.0`. Replies will use version `2.0`.
 * Citizens can not successfully send commands with version `1.5`. These commands will not be processed. Replies will use the mnemonic `UNSUPPORTED` and version `1.2`.
 * Citizens can not successfully send commands with version `0.1` nor `2.1` nor `3.0`. These commands will not be processed. Replies will use the mnemonic `UNSUPPORTED` and version `2.0`.
