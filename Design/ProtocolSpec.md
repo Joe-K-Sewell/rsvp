@@ -136,7 +136,7 @@ For instance, the following are all valid sentinels for a server supporting both
 `RSVP/1.0`  
 `RSVP/1.1`  
 
-If the version given is not supported by the server, the server MUST reply `505 RSVP Version Not Supported` and MUST NOT carry out the command. 
+If the version given is not supported by the server, the server MUST reply `UNSUPPORTED` and MUST NOT carry out the command. 
 
 For more information, see the [Version Selection process](#processes-version-selection).
 
@@ -333,11 +333,11 @@ Consider the protocol versions a server supports. They can be thought of being s
 3. If `x` is not a key in `V`:
 	1. Let `a` be the greatest key in `V`.  
 	2. Let `b` be the greatest value in `V[a]`.
-	3. The command is rejected with a reply of `505 RSVP Version Not Supported`. The reply indicates version `a.b`. **Processing stops here.**
+	3. The command is given an `UNSUPPORTED` reply. The reply indicates version `a.b`. **Processing stops here.**
 4. Let `S` be the subset of `V[x]` where each element `s` satisfies `y <= s`.
 5. If `S` is empty:
 	1. Let `b` be the greatest value in `V[x]`.
-	2. The command is rejected with a reply of `505 RSVP Version Not Supported`. The reply indicates version `x.b`. **Processing stops here.**
+	2. The command is given an `UNSUPPORTED` reply. The reply indicates version `x.b`. **Processing stops here.**
 6. Let `m` be the the minimum element of `S`.
 7. Implementation `x.m` services the command, and this version number is used on replies to the command. **Processing stops here.**
 
@@ -351,5 +351,5 @@ With the aforementioned example server:
 * Citizens can also send commands with either version `1.1` or `1.2`. These commands will be fulfilled by the server's implementation of `1.2`. Replies will indicate version `1.2`.
 * Citizens can also send commands with version `2.0`.  These commands will be fulfilled by the server's implementation of `2.0`. Replies will use version `2.0`.
 * Citizens can also send commands with no version specified.  These commands will be fulfilled by the server's implementation of `2.0`. Replies will use version `2.0`.
-* Citizens can not successfully send commands with version `1.5`. These commands will not be processed. Replies will be `505 RSVP Version Not Supported` and use version `1.2`.
-* Citizens can not successfully send commands with version `0.1` nor `2.1` nor `3.0`. These commands will not be processed. Replies will be `505 RSVP Version Not Supported` and use version `2.0`.
+* Citizens can not successfully send commands with version `1.5`. These commands will not be processed. Replies will use the mnemonic `UNSUPPORTED` and version `1.2`.
+* Citizens can not successfully send commands with version `0.1` nor `2.1` nor `3.0`. These commands will not be processed. Replies will use the mnemonic `UNSUPPORTED` and version `2.0`.
