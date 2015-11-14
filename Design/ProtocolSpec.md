@@ -235,14 +235,13 @@ After receiving and processing a command, the server issues a corresponding **re
 
 Commands are issued in the form:
 
-	(reply code) (reply name) (sentinel)
+	(reply mnemonic) (sentinel)
 	
 	[(body)]
 
-* Reply code - A numerical representation (three digit decimal integer) of the type of reply.
-* Reply name - A human-readable representation of the type of reply.
-* Sentinel - A key phrase indicating the version of the server logic that handled the command.
-* Body - Additional human- (and occasionally machine-) readable text describing the result.
+* **Reply mnemonic** - A textual representation of the type of reply.
+* **Sentinel** - A key phrase indicating the version of the server logic that handled the command.
+* **Body** - Additional human- (and occasionally machine-) readable text describing the result.
 
 Note that the order of the elements in the first line is different than that of an HTTP response: the sentinel comes last.
 
@@ -256,113 +255,64 @@ Sentinels take the form:
 
 where `major` and `minor` correspond to the major and minor version number of the protocol version that was used to service the command.
 
-For more information, see the [Version Selection process](#processes-version-selection).
+For information about which version that MUST be given, see the [Version Selection process](#processes-version-selection).
 
-### Reply Codes 0xx (Implementation-reserved)
+### Body
 
-Reply codes that begin with `0` will not be used by this specification. They MAY be used by implementations for replies when no specified reply code is sufficient, especially for implementation-specific behavior.
+Some replies have additional information, such as the results of a `LIST` command. This information SHOULD be human-readable, and may contain line breaks.
 
-Because reply codes MUST have exactly three decimal digits, these reply codes require a leading `0`. A reply code like `15` is not valid, but `015` is.
+### Mnemonics
 
-### Reply Codes 1xx (Pending Server Action)
+#### ACK
 
+The command was received and processed successfully, and there is no further information to report. The body MUST be empty.
 
-### Reply Codes 2xx (Success)
+#### TEXT
 
-### Reply Codes 3xx (Pending Citizen Action)
+The command was received and processed successfully. The body MUST contain content relevant to the command.
 
-### Reply Codes 4xx (Citizen Error)
+#### NEW
 
-### Reply Codes 5xx (Server Error)
+The command was received and processed successfully. As a result, a new entity was created on the server. The body MAY contain additional information about what was created.
 
-#### 505 RSVP Version Not Supported
+#### REJECTED
 
-The server does not support the version specified by the command's sentinel.
+The command was received and processed, but could not be completed. The body SHOULD explain why.
 
-For instance, if a server only supports version `1.0` and a citizen issues `RSVP/1.1 VOTE Joe's`, the server MUST reply with `505`. This is the case even if the command could be issued with a `1.0` sentinel and be processed successfully; because the server does not support version `1.1`, it has no way of knowing whether the `1.0` processing of the command is correct when the citizen expects the `1.1` behavior.
+#### BAD
 
-For more information, see the [Version Selection process](#processes-version-selection).
+The command could not be completed because it is invalid. The body MAY contain information about why the command was invalid.
+
+#### BAD TIME
+
+The command could not be completed because it is not applicable at this time. The body MAY contain information about what times the command would be valid.
+
+#### BAD CITIZEN
+
+The command can't be executed by the commanding citizen. The body MAY contain reasoning for this restriction.
+
+#### UNSUPPORTED
+
+The server does not support the version specified by the command's sentinel. The body MAY explain why the command failed, and recommend using the version specified in the reply itself.
+
+See the [Version Selection process](#processes-version-selection).
+
+#### ERROR
+
+The server erred. The body SHOULD contain human-readable details of the error, if they can be relayed without exposing secure implementation information.
 
 ## Decrees
 
 Decrees are issued by servers in the form:
 
-	(sentinel) Decree (decree_number) (decree_name)
+	(sentinel) (decree_number) (decree_name)
 	
 	[(body)]
 
-* **Sentinel** - A keyword or phrase introducing the decree (same as in commands; see above).
-* **Decree number** - A canonical number corresponding to the kind of decree issued. Expressed in a series of natural numbers, delimited by `.` - e.g., `3.0`.
+* **Sentinel** - A keyword or phrase introducing the decree.
+* **Decree number** - A canonical three-digit number corresponding to the kind of decree issued.
 * **Decree name** - A human-readable description of the decree.
 * **Body** - Human-readable information contained in the decree. May have further line-breaks.
-
-### 0 Plugin-reserved
-
-### 1 In Progress
-
-Issued to indicate a process has been started and continues.
-
-#### 1.0 Election Status
-
-Issued by the ES to report periodic results, such as the current candidates.
-
-	RSVP/0.1 Decree 1.0 Election Status
-	
-	Current suggestions:
-	Big Dipper, Cookie Factory, Joe's, Tex-Mex House 
-
-	5 minutes remain to SUGGEST.
-
-#### 1.1 Election Begins
-
-The ES has begun an election. Can be issued alongside `1.2` and/or `1.3`.
-
-	RSVP/0.1 Decree 1.1 Election Begins
-	
-	Today's election has opened.
-
-#### 1.2 Suggestion Begins
-
-The ES is now accepting suggestions for an election.
-
-	RSVP/0.1 Decree 1.2 Suggestion Begins
-	
-	Today's primary has started. SUGGEST lunch locations.
-	The primary will close at 11:45 AM.
-
-#### 1.3 Voting Begins
-
-The ES is now accepting votes on candidates.
-
-	RSVP/0.1 Decree 1.3 Voting Begins
-	
-	Today's general election has started. VOTE on candidates.
-	The voting will close at 12:00 Noon.
-
-### 2 Success
-
-#### 2.1 Election Results
-
-The ES has completed an election and has results.
-
-	RSVP/0.1 Decree 2.1 Election Results
-	
-	Joe's (3 votes)
-	Tex-Mex House (2 votes)
-	Big Dipper (2 votes)
-	Cookie Factory (0 votes)
-
-#### 2.2 Suggestion Closed
-
-The ES has stopped accepting suggestions.
-
-#### 2.3 Voting Closed
-
-The ES has stopped accepting votes.
-
-### 3 Abnormal
-
-### 4 Failure
 
 # Processes
 
