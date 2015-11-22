@@ -360,12 +360,50 @@ Decrees are issued by service in the form:
 
 	(decree_number) (decree_name) (sentinel)
 	
-	[(body)]
+	(body)
 
 * **Sentinel** - A keyword or phrase introducing the decree.
-* **Decree number** - A canonical three-digit number corresponding to the kind of decree issued.
+* **Decree code** - A canonical three-digit number corresponding to the kind of decree issued.
 * **Decree name** - A human-readable description of the decree.
 * **Body** - Human-readable information contained in the decree. May have further line-breaks.
+
+### Sentinel
+
+Same as for replies. Note that the version specified is the version that generated the decree, which MUST always be the newest supported version.
+
+### Body
+
+All decrees SHOULD contain explanatory text or additional information. See each decree code/name for more information.
+
+### Codes 0xx: Implementation-defined
+
+This protocol defines no decrees whose code begins with `0`. Such numbers MAY be used by implementations when no protocol-defined number fits the purpose of the decree.
+
+All decree numbers MUST be exactly three digits long. `007` is a valid decree number; `7` is not.
+
+### Codes 1xx: Begin
+
+Indicates that the service is now allowing citizens to take some action. For instance, to announce that an election has begun.
+
+#### 150 Service Available
+
+Announces that the service is available to receive commands.
+
+### Codes 2xx: End
+
+#### 250 Service Closing
+
+Announces that the service is no longer receiving commands, due to an expected shutdown.
+
+### Codes 3xx: Information Needed
+
+### Codes 4xx: Electorate Error
+
+### Codes 5xx: Service Error
+
+#### 550 Service Failed
+
+Announces the service encountered an internal error, and will no longer receive commands as a result.
 
 # Processes
 
