@@ -181,8 +181,8 @@ Issued by a citizen to indicate a location should be considered in the current e
 * **Path**: Required. The name of the location.
 * **Options**: None protocol-defined.
 * **Replies**:
-	* `ACCEPT` if the location was suggested successfully.
-	* `ACCEPT NEW-LOCATION` if the location was unrecognized by the service, but the service automatically registered it and allowed the suggestion to complete.
+	* `ACCEPT` if the location was suggested successfully. Possible flags:
+		* `NEW-LOCATION` if the location was unrecognized by the service, but the service automatically registered it and allowed the suggestion to complete.
 	* `REFUSE` if the suggestion was not taken into account. Reasons might include the location being vetoed, or having already been suggested.  
 	* `REFUSE TIME` if the service is not accepting suggestions at this time.
 
@@ -197,8 +197,9 @@ Issued by a citizen to voice their opinion on a location in the current election
 * **Path**: Required. The name of the location.
 * **Options**: None protocol-defined.
 * **Replies**:
-	* `ACCEPT` if the vote was counted successfully.
-	* `ACCEPT NEW-LOCATION` if the location hadn't been suggested, but the service automatically suggested it and allowed the vote to be counted.
+	* `ACCEPT` if the vote was counted successfully.Possible flags:
+		* `NEW-CANDIDATE` if the location hadn't been suggested, but the service automatically suggested it and allowed the vote to be counted.
+		* `NEW-LOCATION` if the location was unrecognized by the service, but the service automatically registered it and allowed the vote to complete.
 	* `REFUSE` if the vote was not taken into account. Reasons might include the citizen having already used all of their votes, or the location not being suggested.
 	* `REFUSE TIME` if the service is not accepting votes at this time.
 
@@ -326,8 +327,9 @@ The command was received and processed successfully.
 
 Flags:
 
-* `NEW-CITIZEN`: The citizen who sent the command was not previously recognized by the service, but now is. This may be due to a `REGISTER` command, or the service may automatically register citizens when they send their first commands.
+* `NEW-CITIZEN`: The citizen who sent the command was not previously recognized by the service, but now is. This may be due to a `REGISTER` command, or the service may automatically register citizens when they send their first commands. 
 * `NEW-LOCATION`: The location specified by the command was not previously recognized by the service, but now is. This may be due to a `REGISTER` command, or the service may automatically register locations when they are first mentioned by commands.
+* `NEW-CANDIDATE`: The location specified by the command was not previously a candidate in the current election, but now is. This may be due to a `SUGGEST` command, or the service may automatically consider a `VOTE` for an un-suggested location to be an implicit suggestion.
 
 #### REFUSE
 
