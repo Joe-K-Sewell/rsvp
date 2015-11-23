@@ -377,35 +377,93 @@ Same as for replies. Note that the version specified is the version that generat
 
 All decrees SHOULD contain explanatory text or additional information. See each decree code/name for more information.
 
-### Codes 0xx: Implementation-defined
+### Codes 0xx: Intermediate Results
 
-This protocol defines no decrees whose code begins with `0`. Such numbers MAY be used by implementations when no protocol-defined number fits the purpose of the decree.
+Provides information about a currently-running action.
 
-All decree numbers MUST be exactly three digits long. `007` is a valid decree number; `7` is not.
+#### 000 Time Warning
+
+Indicates that the time remaining for citizens to perform an action, such as vote, is limited. The body MUST indicate the time limit (either in time span remaining, or a defined time), and what action will be unavailable at that time.
+
+#### 001 Running Totals
+
+A list of the current candidates in the election. The body of the decree MUST be identical to that of a reply from a `LIST candidates` command.
 
 ### Codes 1xx: Begin
 
-Indicates that the service is now allowing citizens to take some action. For instance, to announce that an election has begun.
+Indicates that the service is beginning some action, which may mean certain commands will now be permitted.
 
-#### 150 Service Available
+#### 100 Election Begins
+
+An election has begun. The body SHOULD indicate when the election will end.
+
+#### 101 Suggestions Open
+
+Citizens can now use the `SUGGEST` command. The body SHOULD indicate when suggestions will be closed.
+
+#### 102 Voting Open
+
+Citizens can now use the `VOTE` command. The body SHOULD indicate when voting will be closed.
+
+#### 110 Service Available
 
 Announces that the service is available to receive commands.
 
-### Codes 2xx: End
+### Codes 2xx: Complete
 
-#### 250 Service Closing
+Indicates that the service has completed some action, which may mean certain commands are no longer permitted.
+
+#### 200 Election Complete
+
+The election has finished. The body MUST contain the results of the election, however the ES defines that.
+
+#### 201 Suggestions Closed
+
+Citizens can no longer use the `SUGGEST` command.
+
+#### 202 Voting Closed
+
+Citizens can no longer use the `VOTE` command.
+
+#### 210 Service Closing
 
 Announces that the service is no longer receiving commands, due to an expected shutdown.
 
 ### Codes 3xx: Information Needed
 
+Indicates that the electorate needs to provide further information in order for the service to complete some action.
+
+#### 300 Multiple Choices
+
+The election resulted in a tie. The body MUST contain the results of the election, however the ES defines that.
+
+Based on the ES, the service MAY run another election (emitting a new `100` decree) to break the tie.
+
+#### 301 Moved Permanently
+
+#### 302 Found
+
+#### 303 See Other
+
+#### 304 Not Modified
+
 ### Codes 4xx: Electorate Error
+
+Indicates that the service failed to complete some action because information or commands were not provided by the electorate.
+
+#### 401 Unauthorized
+
+#### 402 Payment Required
+
+#### 403 Forbidden
+
+#### 404 Not Found
+
+#### 418 I'm a Teapot
 
 ### Codes 5xx: Service Error
 
-#### 550 Service Failed
-
-Announces the service encountered an internal error, and will no longer receive commands as a result.
+Indicates that the service failed to complete some action, due to an internal issue.
 
 # Processes
 
