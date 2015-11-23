@@ -197,7 +197,7 @@ Issued by a citizen to voice their opinion on a location in the current election
 * **Path**: Required. The name of the location.
 * **Options**: None protocol-defined.
 * **Replies**:
-	* `ACCEPT` if the vote was counted successfully.Possible flags:
+	* `ACCEPT` if the vote was counted successfully. Possible flags:
 		* `NEW-CANDIDATE` if the location hadn't been suggested, but the service automatically suggested it and allowed the vote to be counted.
 		* `NEW-LOCATION` if the location was unrecognized by the service, but the service automatically registered it and allowed the vote to complete.
 	* `REFUSE` if the vote was not taken into account. Reasons might include the citizen having already used all of their votes, or the location not being suggested.
@@ -213,8 +213,8 @@ Issued by a citizen to retract a prior VOTE.
 * **Options**: None protocol-defined.
 * **Replies**:
 	* `ACCEPT` if the vote was rescinded successfully.
-	* `REFUSE` if the vote could not be rescinded. Reasons might include the specified vote having not been made.
-	* `REFUSE TIME` if the service is not accepting votes at this time, so no there are no votes to rescind.
+	* `REFUSE` if the vote could not be rescinded. Reasons might include the specified vote having not been made. Possible flags:
+		* `TIME` if the service is not accepting votes at this time, so no there are no votes to rescind.
 
 The ES SHOULD reverse all effects made by the prior VOTE. If there can be multiple VOTEs, the ES MAY either reverse all VOTEs with a single RESCIND, or require the vote be specified by the path and/or options.
 
@@ -233,8 +233,8 @@ Issued by a citizen to inform the service of the existence of an entity: either 
 	* **Options**: The metadata to include with the location.
 	* **Replies**:
 		* `ACCEPT NEW-LOCATION` if the location was registered.
-		* `REFUSE` if the location could not be registered. Reasons might include the location already being registered.
-		* `REFUSE TIME` if the service is not allowing locations to be registered at thist time.
+		* `REFUSE` if the location could not be registered. Reasons might include the location already being registered. Possible flags:
+			* `TIME` if the service is not allowing locations to be registered at this time.
 
 Implementations MAY automatically register citizens and locations as they are used, instead of requiring the use of this verb.
 
@@ -247,7 +247,8 @@ Issued by a citizen to update the metadata of a location.
 	* If the option value is empty, the associated metadata will be removed.
 * **Replies**:
 	* `ACCEPT` if the metadata was updated.
-	* `REFUSE` if the metadata could not be updated. Reasons might include the location not having been registered.
+	* `REFUSE` if the metadata could not be updated. Reasons might include the location not having been registered. Possible flags:
+		* `TIME` if the service is not allowing metadata to be modified at this time.
 
 #### LIST
 
@@ -262,7 +263,8 @@ Issued by a citizen to list all locations, candidate locations, the metadata of 
 	* **Path**: Required. The literal `candidates`.
 	* **Options**: None protocol-defined.
 	* **Replies**:
-		* `ACCEPT`, the body MUST contain a newline-separated list of location names that have been suggested. 
+		* `ACCEPT`, the body MUST contain a newline-separated list of location names that have been suggested.
+		* `REJECT TIME` if there is no election currently in progress.
 * If listing the metadata of a location:
 	* **Path**: Required. The name of a location.
 	* **Options**: None protocol-defined.
